@@ -28,6 +28,14 @@
 			function convert() {
 				var start = new Date();
 				HTMLReg.setAppID('myApplication');
+				HTMLReg.setDebugObjs({
+					'parseTree':function(parseTree) {
+						document.getElementById('parseTree').value = parseTree;
+					},
+					'rawOutput':function(rawOuput) {
+						document.getElementById('rawOutput').value = rawOuput;
+					}
+				});
 				document.getElementById('parseTree').value='';
 				var output = HTMLReg.parse(document.getElementById('input').value);				
 				document.getElementById('htmlOutput').innerHTML = output;				
