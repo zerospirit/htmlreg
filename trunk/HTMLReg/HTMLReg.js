@@ -1,10 +1,11 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.16
+ * Version: 0.1.17
  */			
 window.HTMLReg = function() {
 	var appID = '',
+	debug = {},
 	parseTree = '',
 	attributeLength = 1000,
 	maxAttributes = 20,
@@ -171,14 +172,22 @@ window.HTMLReg = function() {
 				parseTree+='invalidTags('+$invalidTags+')\n';									
 			} 
 		});
-		document.getElementById('rawOutput').value = output;
-		document.getElementById('parseTree').value = parseTree;
+		
+		if(debug['rawOutput']) {
+			debug['rawOutput'](output);			
+		}
+		if(debug['parseTree']) {
+			debug['parseTree'](parseTree);			
+		}					
 		return executeHTML(output);
 	};		
 	return {
 		parse: parse,
 		setAppID: function (id) {				
 			appID = id;
+		},
+		setDebugObjs: function(obj) {
+			debug = obj;
 		}
 	};
 }();
