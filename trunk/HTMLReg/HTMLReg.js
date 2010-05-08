@@ -1,10 +1,11 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.17
+ * Version: 0.1.18
  */			
 window.HTMLReg = function() {
 	var appID = '',
+	imageProxy = 'http://www.gmodules.com/ig/proxy?url=',
 	debug = {},
 	parseTree = '',
 	attributeLength = 1000,
@@ -114,16 +115,16 @@ window.HTMLReg = function() {
 		}													
 		try {
 			if (HTMLhref !== '' && typeof HTMLhref != 'undefined' && HTMLhref !== null) {
-				element.href = HTMLhref;
+				element.href = imageProxy + encodeURIComponent(HTMLhref);
 			}
 			if (HTMLsrc !== '' && typeof HTMLsrc != 'undefined' && HTMLsrc !== null) {
-				element.src = HTMLsrc;
+				element.src = imageProxy + encodeURIComponent(HTMLsrc);
 			}
 			if (HTMLbackground !== '' && typeof HTMLbackground != 'undefined' && HTMLbackground !== null) {
-				element.setAttribute('background', HTMLbackground);
+				element.setAttribute('background', imageProxy + encodeURIComponent(HTMLbackground));
 			}
 			if (HTMLaction !== '' && typeof HTMLaction != 'undefined' && HTMLaction !== null) {
-				element.action = HTMLaction;
+				element.action = imageProxy + encodeURIComponent(HTMLaction);
 			}
 			if (HTMLID !== '' && typeof HTMLID != 'undefined' && HTMLID !== null) {
 				element.id = HTMLID;
