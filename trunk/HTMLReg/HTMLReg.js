@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.21
+ * Version: 0.1.23
  */			
 window.HTMLReg = function() {
 	var appID = '',
@@ -11,14 +11,14 @@ window.HTMLReg = function() {
 	attributeLength = 1000,
 	maxAttributes = 20,
 	textNodeLength = 1000,
-	allowedTags = /(?:audio|aside|article|a|abbr|acronym|address|area|b|bdo|big|br|canvas|caption|center|cite|code|col|dd|del|dfn|dir|div|dl|dt|em|font|h[1-6]|hr|i|img|ins|kbd|li|map|ol|p|pre|q|s|samp|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|tt|u|ul|blockquote|image|video|xmp)/,
-	allowedAttributes = /(?:accesskey|align|alink|alt|background|bgcolor|border|cellpadding|cellspacing|class|color|cols|colspan|coords|dir|face|height|href|hspace|id|ismap|lang|marginheight|marginwidth|multiple|name|nohref|noresize|noshade|nowrap|ref|rel|rev|rows|rowspan|scrolling|shape|span|src|style|summary|tabindex|target|title|usemap|valign|value|vlink|vspace|width)/,		
+	allowedTags = /(?:form|optgroup|button|legend|fieldset|label|option|select|textarea|input|audio|aside|article|a|abbr|acronym|address|area|b|bdo|big|br|canvas|caption|center|cite|code|col|dd|del|dfn|dir|div|dl|dt|em|font|h[1-6]|hr|i|img|ins|kbd|li|map|ol|p|pre|q|s|samp|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|tt|u|ul|blockquote|image|video|xmp)/,
+	allowedAttributes = /(?:type|accesskey|align|alink|alt|background|bgcolor|border|cellpadding|cellspacing|class|color|cols|colspan|coords|dir|face|height|href|hspace|id|ismap|lang|marginheight|marginwidth|multiple|name|nohref|noresize|noshade|nowrap|ref|rel|rev|rows|rowspan|scrolling|shape|span|src|style|summary|tabindex|target|title|usemap|valign|value|vlink|vspace|width)/,		
 	attributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s'\"`>]{1,"+attributeLength+"}|'[^']{0,"+attributeLength+"}')"),
 	invalidAttributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s>]{1,"+attributeLength+"}|'[^>]{0,"+attributeLength+"}')"),
 	attributes = new RegExp('\\s+'+allowedAttributes.source+'\\s*='+attributeValues.source),				
 	urls = /^(?:https?:\/\/.+|\/.+|\w[^:]+)$/,				
 	text = new RegExp('[^<>]{1,'+textNodeLength+'}'),
-	styleTag = /(?:<style>[^<>]+<\/style>)/,
+	styleTag = /(?:<style>[^<>]+<\/style>)/,	
 	invalidTags = new RegExp('<[^>]+(?:(?:[\\s\\/]+\\w+\\s*='+invalidAttributeValues.source+')+)>'),	
 	mainRegExp = new RegExp('('+styleTag.source+')|(<\\\/?[a-z0-9]{1,10}(?:'+attributes.source+'){0,'+maxAttributes+'}(?:\\s*\\\/?)>)|('+text.source+')|('+invalidTags.source+')','ig'),						
 	executeHTML = function(html) {
@@ -181,7 +181,7 @@ window.HTMLReg = function() {
 				output += $styleTag;									
 			} else if($text !== undefined && $text.length) {
 				output += $text;					
-				parseTree+='text('+$text+')\n';									
+				parseTree+='text('+$text+')\n';						
 			} else if($invalidTags !== undefined && $invalidTags.length) {								
 				parseTree+='invalidTags('+$invalidTags+')\n';									
 			} 
