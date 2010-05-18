@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.23
+ * Version: 0.1.24
  */			
 window.HTMLReg = function() {
 	var appID = '',
@@ -16,7 +16,7 @@ window.HTMLReg = function() {
 	attributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s'\"`>]{1,"+attributeLength+"}|'[^']{0,"+attributeLength+"}')"),
 	invalidAttributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s>]{1,"+attributeLength+"}|'[^>]{0,"+attributeLength+"}')"),
 	attributes = new RegExp('\\s+'+allowedAttributes.source+'\\s*='+attributeValues.source),				
-	urls = /^(?:https?:\/\/.+|\/.+|\w[^:]+)$/,				
+	urls = /^(?:https?:\/\/.+|\/.+|\w[^:]+|#[\w=?]+)$/,				
 	text = new RegExp('[^<>]{1,'+textNodeLength+'}'),
 	styleTag = /(?:<style>[^<>]+<\/style>)/,	
 	invalidTags = new RegExp('<[^>]+(?:(?:[\\s\\/]+\\w+\\s*='+invalidAttributeValues.source+')+)>'),	
@@ -115,7 +115,11 @@ window.HTMLReg = function() {
 		}													
 		try {
 			if (HTMLhref !== '' && typeof HTMLhref != 'undefined' && HTMLhref !== null) {
-				element.href = imageProxy + encodeURIComponent(HTMLhref);
+				if(/^#/.test(HTMLhref)) {
+					element.href = HTMLhref;
+				} else {					
+					element.href = imageProxy + encodeURIComponent(HTMLhref);
+				}
 			}
 			if (HTMLsrc !== '' && typeof HTMLsrc != 'undefined' && HTMLsrc !== null) {
 				element.src = imageProxy + encodeURIComponent(HTMLsrc);
