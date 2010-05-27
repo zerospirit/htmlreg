@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.24
+ * Version: 0.1.25
  */			
 window.HTMLReg = function() {
 	var appID = '',
@@ -55,7 +55,16 @@ window.HTMLReg = function() {
 		}
 		return value;
 	},
-	parseAttrValues = function(tag) {						
+	parseAttrValues = function(tag) {		
+		var tagName = '';
+		tag = tag.replace(new RegExp('^(<\\\/?)('+allowedTags.source+')','i'), function($0, $start, $tagName) {
+			tagName = $tagName;
+			return $start + 'div';
+		})
+		if(tagName === '') {
+			return '';
+		}				
+		
 		var div = document.createElement("div");
 		var html = '';		
 		div.style.display = 'none';			
@@ -137,7 +146,7 @@ window.HTMLReg = function() {
 				element.className = HTMLClass;
 			}
 		} catch(e) {}										
-		html += '<' + element.tagName;
+		html += '<' + tagName;
 		for(var i=0;i<element.attributes.length;i++) {
 			var nodeValue = element.attributes[i].nodeValue; 
 			if(nodeValue == null || nodeValue === '') {
