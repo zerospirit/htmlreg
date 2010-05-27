@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.25
+ * Version: 0.1.26
  */			
 window.HTMLReg = function() {
 	var appID = '',
@@ -57,14 +57,13 @@ window.HTMLReg = function() {
 	},
 	parseAttrValues = function(tag) {		
 		var tagName = '';
-		tag = tag.replace(new RegExp('^(<\\\/?)('+allowedTags.source+')','i'), function($0, $start, $tagName) {
+		tag = tag.replace(new RegExp('^(<\\\/?)('+allowedTags.source+')(\\s)','i'), function($0, $start, $tagName, $end) {
 			tagName = $tagName;
-			return $start + 'div';
+			return $start + 'div' + $end;
 		})
 		if(tagName === '') {
 			return '';
-		}				
-		
+		}						
 		var div = document.createElement("div");
 		var html = '';		
 		div.style.display = 'none';			
@@ -74,7 +73,7 @@ window.HTMLReg = function() {
 			return '';
 		}		
 		var HTMLhref = parseURL('href',element);
-		var HTMLsrc = parseURL('src',element);
+		var HTMLsrc = parseURL('src',element);		
 		var HTMLbackground = parseURL('background',element);			
 		var HTMLaction = parseURL('action',element);				
 		if(element.id !== '') {				
@@ -125,19 +124,19 @@ window.HTMLReg = function() {
 		try {
 			if (HTMLhref !== '' && typeof HTMLhref != 'undefined' && HTMLhref !== null) {
 				if(/^#/.test(HTMLhref)) {
-					element.href = HTMLhref;
+					element.setAttribute('href', HTMLhref);
 				} else {					
-					element.href = imageProxy + encodeURIComponent(HTMLhref);
+					element.setAttribute('href', imageProxy + encodeURIComponent(HTMLhref));
 				}
 			}
 			if (HTMLsrc !== '' && typeof HTMLsrc != 'undefined' && HTMLsrc !== null) {
-				element.src = imageProxy + encodeURIComponent(HTMLsrc);
+				element.setAttribute('src', imageProxy + encodeURIComponent(HTMLsrc));
 			}
 			if (HTMLbackground !== '' && typeof HTMLbackground != 'undefined' && HTMLbackground !== null) {
 				element.setAttribute('background', imageProxy + encodeURIComponent(HTMLbackground));
 			}
 			if (HTMLaction !== '' && typeof HTMLaction != 'undefined' && HTMLaction !== null) {
-				element.action = imageProxy + encodeURIComponent(HTMLaction);
+				element.setAttribute('action', imageProxy + encodeURIComponent(HTMLaction));
 			}
 			if (HTMLID !== '' && typeof HTMLID != 'undefined' && HTMLID !== null) {
 				element.id = HTMLID;
