@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.26
+ * Version: 0.1.27
  */			
 window.HTMLReg = function() {
 	var appID = '',
@@ -122,6 +122,9 @@ window.HTMLReg = function() {
 			element.setAttribute('sandbox-style',css);			
 		}													
 		try {
+			if(/^a$/i.test(tagName)) {
+				element.setAttribute('rel','nofollow');
+			}
 			if (HTMLhref !== '' && typeof HTMLhref != 'undefined' && HTMLhref !== null) {
 				if(/^#/.test(HTMLhref)) {
 					element.setAttribute('href', HTMLhref);
