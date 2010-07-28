@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.28
+ * Version: 0.1.29
  */			
 window.HTMLReg = function() {
 	var appID = '',
@@ -79,7 +79,7 @@ window.HTMLReg = function() {
 		if(element.id !== '') {				
 			var id = element.id+'';
 			id = id.replace(/[^\w]/g,'');				
-			var HTMLID = '_'+appID+'_'+id+'_';				
+			var HTMLID = appID+'_'+id+'_';				
 		} else {
 			var HTMLID = '';
 		}
@@ -97,7 +97,7 @@ window.HTMLReg = function() {
 			}
 			for(var i=0;i<len;i++) {
 				if(/^[\w]+$/.test(classList[i])) {
-					HTMLClass += '_'+appID+'_'+classList[i]+'_ ';
+					HTMLClass += appID+'_'+classList[i]+'_ ';
 				}
 			}
 			HTMLClass = HTMLClass.replace(/\s$/,'');
