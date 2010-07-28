@@ -22,9 +22,9 @@ window.HTMLReg = function() {
 	invalidTags = new RegExp('<[^>]+(?:(?:[\\s\\/]+\\w+\\s*='+invalidAttributeValues.source+')+)>'),	
 	mainRegExp = new RegExp('('+styleTag.source+')|(<\\\/?[a-z0-9]{1,10}(?:'+attributes.source+'){0,'+maxAttributes+'}(?:\\s*\\\/?)>)|('+text.source+')|('+invalidTags.source+')','ig'),						
 	executeHTML = function(html) {
-		var div = document.createElement("div");
-		div.innerHTML = html;		
-		html = div.innerHTML;
+		var frag = document.createDocumentFragment();
+		frag.innerHTML = html;		
+		html = frag.innerHTML;
 		var attributes = new RegExp('\\s+(?:sandbox-style|'+allowedAttributes.source+')\\s*='+attributeValues.source);
 		var attributesParens = new RegExp('(?:\\s'+allowedAttributes.source+'\\s*='+attributeValues.source+')|(?:\\s+(sandbox-style)\\s*=('+attributeValues.source+'))','gi');
 		html = html.replace(new RegExp('(?:<[a-z0-9]{1,10}(?:'+attributes.source+'){0,'+maxAttributes+'}(?:\\s*\\\/?)>)','ig'), function($tag) {									
@@ -37,7 +37,7 @@ window.HTMLReg = function() {
 			});
 			return $tag;
 		});
-		div = null;		
+		frag = null;		
 		return html;
 	},	
 	parseURL = function(name, element) {
