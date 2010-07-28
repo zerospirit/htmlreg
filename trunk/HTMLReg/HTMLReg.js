@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.27
+ * Version: 0.1.28
  */			
 window.HTMLReg = function() {
 	var appID = '',
