@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.30
+ * Version: 0.1.31
  */			
 window.HTMLReg = function() {
 	var appID = '',
@@ -16,7 +16,7 @@ window.HTMLReg = function() {
 	attributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s'\"`>]{1,"+attributeLength+"}|'[^']{0,"+attributeLength+"}')"),
 	invalidAttributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s>]{1,"+attributeLength+"}|'[^>]{0,"+attributeLength+"}')"),
 	attributes = new RegExp('\\s+'+allowedAttributes.source+'\\s*='+attributeValues.source),				
-	urls = /^(?:https?:\/\/.+|\/.+|\w[^:]+|#[\w=?]+)$/,				
+	urls = /^(?:https?:\/\/.+|\/.+|\w[^:]+|#[\w=?]*)$/,				
 	text = new RegExp('[^<>]{1,'+textNodeLength+'}'),
 	styleTag = /(?:<style>[^<>]+<\/style>)/,	
 	invalidTags = new RegExp('<[^>]+(?:(?:[\\s\\/]+\\w+\\s*='+invalidAttributeValues.source+')+)>'),	
@@ -47,7 +47,8 @@ window.HTMLReg = function() {
 		}
 		if(element[name] === '') {
 			return '';
-		}			
+		}				
+		
 		if(urls.test(element.getAttribute(name))) {
 			var value = element.getAttribute(name);
 		} else {
@@ -125,7 +126,7 @@ window.HTMLReg = function() {
 			if(/^a$/i.test(tagName)) {
 				element.setAttribute('rel','nofollow');
 			}
-			if (HTMLhref !== '' && typeof HTMLhref != 'undefined' && HTMLhref !== null) {
+			if (HTMLhref !== '' && typeof HTMLhref != 'undefined' && HTMLhref !== null) {				
 				if(/^#/.test(HTMLhref)) {
 					element.setAttribute('href', HTMLhref);
 				} else {					
@@ -156,7 +157,7 @@ window.HTMLReg = function() {
 			}
 			html += ' ' + element.attributes[i].nodeName + '=' + '"'+escapeHTML(nodeValue)+'"';
 		}
-		html += '>';							
+		html += '>';		
 		div = null;		
 		return html;
 	},
@@ -177,7 +178,7 @@ window.HTMLReg = function() {
 		html += '\n<\/style>';
 		return html;
 	},
-	parse = function(html) {
+	parse = function(html) {		
 		var output = '';
 		parseTree = '';
 		html.replace(mainRegExp, function($0, $styleTag, $tag, $text, $invalidTags) {
@@ -217,7 +218,6 @@ window.HTMLReg = function() {
 		},
 		setDebugObjs: function(obj) {
 			debug = obj;
-		},
-		parseURL:parseURL
+		}		
 	};
 }();
