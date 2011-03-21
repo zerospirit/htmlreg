@@ -1,17 +1,17 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.2
+ * Version: 0.2.1
  */			
 window.HTMLReg = function() {
 	var appID = '',
-	disablePositioning = false,
 	imageProxy = 'http://www.gmodules.com/ig/proxy?url=',
 	debug = {},
 	parseTree = '',
 	attributeLength = 1000,
 	maxAttributes = 20,
 	textNodeLength = 1000,
+	selfClosing = /^(?:input|br|hr|img|image)$/i,
 	allowedTags = /(?:canvas|form|optgroup|button|legend|fieldset|label|option|select|textarea|input|audio|aside|article|a|abbr|acronym|address|area|b|bdo|big|br|canvas|caption|center|cite|code|col|dd|del|dfn|dir|div|dl|dt|em|font|h[1-6]|hr|i|img|ins|kbd|li|map|ol|p|pre|q|s|samp|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|tt|u|ul|blockquote|image|video|xmp)/,
 	allowedAttributes = /(?:type|accesskey|align|alink|alt|background|bgcolor|border|cellpadding|cellspacing|class|color|cols|colspan|coords|dir|face|height|href|hspace|id|ismap|lang|marginheight|marginwidth|multiple|name|nohref|noresize|noshade|nowrap|ref|rel|rev|rows|rowspan|scrolling|shape|span|src|style|summary|tabindex|target|title|usemap|valign|value|vlink|vspace|width)/,		
 	attributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s'\"`>]{1,"+attributeLength+"}|'[^']{0,"+attributeLength+"}')"),
@@ -21,7 +21,34 @@ window.HTMLReg = function() {
 	text = new RegExp('[^<>]{1,'+textNodeLength+'}'),
 	styleTag = /(?:<style>[^<>]+<\/style>)/,	
 	invalidTags = new RegExp('<[^>]+(?:(?:[\\s\\/]+\\w+\\s*='+invalidAttributeValues.source+')+)>'),	
-	mainRegExp = new RegExp('('+styleTag.source+')|(<\\\/?[a-z0-9]{1,10}(?:'+attributes.source+'){0,'+maxAttributes+'}(?:\\s*\\\/?)>)|('+text.source+')|('+invalidTags.source+')','ig'),						
+	mainRegExp = new RegExp('('+styleTag.source+')|(<\\\/?[a-z0-9]{1,10}(?:'+attributes.source+'){0,'+maxAttributes+'}(?:\\s*\\\/?)>)|('+text.source+')|('+invalidTags.source+')','ig'),							
+	StringtoXML = function (text){		
+		try {
+			if(window.DOMParser) {
+			  var parser=new DOMParser();
+		      var doc=parser.parseFromString(text,'text/xml');		      
+		      var xml = (new XMLSerializer()).serializeToString(doc);
+		      xml = xml.replace(/^<\?[^?]+\?>\s*/,'');		      
+		      if(/<parsererror[^>]+>/.test(xml)) {
+		    	  return 'Invalid HTML markup';
+		      } else {
+		    	  return xml;
+		      }
+			} else if(window.ActiveXObject){
+	          var doc=new ActiveXObject('Microsoft.XMLDOM');
+	          doc.async='false';
+	          doc.loadXML(text);
+	          if(!doc.xml) {
+	        	  throw {};
+	          }
+	          return doc.xml;
+			} else {
+				return text;
+			}	
+		} catch(e) {
+			return 'Invalid HTML markup';
+		}
+	},
 	executeHTML = function(html) {
 		var frag = document.createDocumentFragment();
 		frag.innerHTML = html;		
@@ -37,9 +64,13 @@ window.HTMLReg = function() {
 				}
 			});
 			return $tag;
-		});
-		frag = null;		
-		return html;
+		});		
+		frag = null;
+		if(HTMLReg.validateHTML) {
+			return StringtoXML(html);
+		} else {
+			return html;
+		}
 	},	
 	parseURL = function(name, element) {
 		var value = '';	
@@ -59,7 +90,7 @@ window.HTMLReg = function() {
 	},
 	parseAttrValues = function(tag) {		
 		var tagName = '';
-		tag = tag.replace(new RegExp('^(<\\\/?)('+allowedTags.source+')(\\s)','i'), function($0, $start, $tagName, $end) {
+		tag = tag.replace(new RegExp('^(<\\\/?)('+allowedTags.source+')(\\s|\\/)','i'), function($0, $start, $tagName, $end) {
 			tagName = $tagName;
 			return $start + 'div' + $end;
 		})
@@ -157,10 +188,13 @@ window.HTMLReg = function() {
 		html += '<' + tagName;
 		for(var i=0;i<element.attributes.length;i++) {
 			var nodeValue = element.attributes[i].nodeValue;			
-			if(nodeValue == null || nodeValue === '' || nodeValue == false) {
+			if(nodeValue == null || nodeValue === '' || nodeValue == false || /contentEditable/i.test(element.attributes[i].nodeName)) {
 				continue;
 			}
 			html += ' ' + element.attributes[i].nodeName + '=' + '"'+escapeHTML(nodeValue)+'"';
+		}
+		if(selfClosing.test(tagName)) {
+			html += ' /';
 		}
 		html += '>';		
 		div = null;		
@@ -193,7 +227,7 @@ window.HTMLReg = function() {
 		parseTree = '';
 		html.replace(mainRegExp, function($0, $styleTag, $tag, $text, $invalidTags) {
 			if($tag !== undefined && $tag.length) {					
-				if(!new RegExp('^<\\\/?'+allowedTags.source+'[\\s>]','i').test($tag)) {
+				if(!new RegExp('^<\\\/?'+allowedTags.source+'\/?[\\s>]','i').test($tag)) {
 					return '';
 				}				
 				parseTree+='tag('+$tag+')\n';
