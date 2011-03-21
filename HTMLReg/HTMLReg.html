@@ -28,6 +28,11 @@
 			function convert() {
 				var start = new Date();
 				HTMLReg.setAppID('myApplication');
+				if(document.getElementById('disablePositioning').checked) {
+					HTMLReg.disablePositioning = true;	
+				} else {
+					HTMLReg.disablePositioning = false;
+				}				
 				HTMLReg.setDebugObjs({
 					'parseTree':function(parseTree) {
 						document.getElementById('parseTree').value = parseTree;
@@ -69,7 +74,7 @@
 				Output:<br>
 				<textarea id="output"></textarea>
 				<br>
-					<input type="button" value="Clear" onclick="clearData();" /> <input type="button" value="Hack test" onclick="hackTest();" /><input type="button" value="Convert" onclick="convert();" /> <span id="convertTime"></span>				
+					Disable positioning CSS? <input type="checkbox" id="disablePositioning" value="1" checked="checked" /><br /><input type="button" value="Clear" onclick="clearData();" /> <input type="button" value="Hack test" onclick="hackTest();" /><input type="button" value="Convert" onclick="convert();" /> <span id="convertTime"></span>				
 				</span>
 				<div id="htmlOutput"></div>
 			</div>

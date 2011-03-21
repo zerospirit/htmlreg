@@ -1,10 +1,11 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.1.33
+ * Version: 0.2
  */			
 window.HTMLReg = function() {
 	var appID = '',
+	disablePositioning = false,
 	imageProxy = 'http://www.gmodules.com/ig/proxy?url=',
 	debug = {},
 	parseTree = '',
@@ -182,7 +183,12 @@ window.HTMLReg = function() {
 		html += '\n<\/style>';
 		return html;
 	},
-	parse = function(html) {		
+	parse = function(html) {	
+		if(HTMLReg.disablePositioning) {
+			CSSReg.disablePositioning = true;
+		} else {	
+			CSSReg.disablePositioning = false;
+		}
 		var output = '';
 		parseTree = '';
 		html.replace(mainRegExp, function($0, $styleTag, $tag, $text, $invalidTags) {
