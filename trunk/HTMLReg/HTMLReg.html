@@ -22,22 +22,19 @@
 				width:350px;
 				float:left;
 			}
+			#htmlOutput {
+				position: relative;
+				width:500px;
+				height:300px;
+				overflow:hidden;
+				border:1px solid #ccc;	
+			}
 		</style>
 		<style type="text/css"></style>
 		<script type="text/javascript">
 			function convert() {
 				var start = new Date();
-				HTMLReg.setAppID('myApplication');
-				if(document.getElementById('disablePositioning').checked) {
-					HTMLReg.disablePositioning = true;	
-				} else {
-					HTMLReg.disablePositioning = false;
-				}
-				if(document.getElementById('validateHTML').checked) {
-					HTMLReg.validateHTML = true;	
-				} else {
-					HTMLReg.validateHTML = false;
-				}				
+				HTMLReg.setAppID('myApplication');							
 				HTMLReg.setDebugObjs({
 					'parseTree':function(parseTree) {
 						document.getElementById('parseTree').value = parseTree;
@@ -79,8 +76,7 @@
 				Output:<br>
 				<textarea id="output"></textarea>
 				<br>
-					Validate html? <input type="checkbox" id="validateHTML" value="1" checked="checked" /><br />
-					Disable positioning CSS? <input type="checkbox" id="disablePositioning" value="1" checked="checked" /><br /><input type="button" value="Clear" onclick="clearData();" /> <input type="button" value="Hack test" onclick="hackTest();" /><input type="button" value="Convert" onclick="convert();" /> <span id="convertTime"></span>				
+					<input type="button" value="Clear" onclick="clearData();" /> <input type="button" value="Hack test" onclick="hackTest();" /><input type="button" value="Convert" onclick="convert();" /> <span id="convertTime"></span>				
 				</span>				
 			</div>
 			<div class="row">

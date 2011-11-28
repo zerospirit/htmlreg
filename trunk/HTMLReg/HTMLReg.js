@@ -1,17 +1,31 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.2.1
- */			
+ * Version: 0.4.2
+ */	
+
+if(Element.prototype && !Element.prototype.staticHTML) {
+	window.Object.defineProperty(Element.prototype, 'staticHTML', {
+		get: function() {
+			HTMLReg.disablePositioning = true;						
+			return HTMLReg.parse(this.innerHTML+'');
+		},
+		set: function(val) {
+			HTMLReg.disablePositioning = true;						
+			this.innerHTML = HTMLReg.parse(val+'');
+		}
+	});
+}
 window.HTMLReg = function() {
 	var appID = '',
 	imageProxy = 'http://www.gmodules.com/ig/proxy?url=',
-	debug = {},
-	parseTree = '',
+	debug = {},	
+	parseTree = '',	
 	attributeLength = 1000,
 	maxAttributes = 20,
 	textNodeLength = 1000,
 	selfClosing = /^(?:input|br|hr|img|image)$/i,
+	consumingTags = /^<(?:textarea|button|option|pre|xmp)[\s\/>]/i,
 	allowedTags = /(?:canvas|form|optgroup|button|legend|fieldset|label|option|select|textarea|input|audio|aside|article|a|abbr|acronym|address|area|b|bdo|big|br|canvas|caption|center|cite|code|col|dd|del|dfn|dir|div|dl|dt|em|font|h[1-6]|hr|i|img|ins|kbd|li|map|ol|p|pre|q|s|samp|small|span|strike|strong|sub|sup|table|tbody|td|tfoot|th|thead|tr|tt|u|ul|blockquote|image|video|xmp)/,
 	allowedAttributes = /(?:type|accesskey|align|alink|alt|background|bgcolor|border|cellpadding|cellspacing|class|color|cols|colspan|coords|dir|face|height|href|hspace|id|ismap|lang|marginheight|marginwidth|multiple|name|nohref|noresize|noshade|nowrap|ref|rel|rev|rows|rowspan|scrolling|shape|span|src|style|summary|tabindex|target|title|usemap|valign|value|vlink|vspace|width)/,		
 	attributeValues = new RegExp("(?:\"[^\"]{0,"+attributeLength+"}\"|[^\\s'\"`>]{1,"+attributeLength+"}|'[^']{0,"+attributeLength+"}')"),
@@ -21,36 +35,9 @@ window.HTMLReg = function() {
 	text = new RegExp('[^<>]{1,'+textNodeLength+'}'),
 	styleTag = /(?:<style>[^<>]+<\/style>)/,	
 	invalidTags = new RegExp('<[^>]+(?:(?:[\\s\\/]+\\w+\\s*='+invalidAttributeValues.source+')+)>'),	
-	mainRegExp = new RegExp('('+styleTag.source+')|(<\\\/?[a-z0-9]{1,10}(?:'+attributes.source+'){0,'+maxAttributes+'}(?:\\s*\\\/?)>)|('+text.source+')|('+invalidTags.source+')','ig'),							
-	StringtoXML = function (text){		
-		try {
-			if(window.DOMParser) {
-			  var parser=new DOMParser();
-		      var doc=parser.parseFromString(text,'text/xml');		      
-		      var xml = (new XMLSerializer()).serializeToString(doc);
-		      xml = xml.replace(/^<\?[^?]+\?>\s*/,'');		      
-		      if(/<parsererror[^>]+>/.test(xml)) {
-		    	  return 'Invalid HTML markup';
-		      } else {
-		    	  return xml;
-		      }
-			} else if(window.ActiveXObject){
-	          var doc=new ActiveXObject('Microsoft.XMLDOM');
-	          doc.async='false';
-	          doc.loadXML(text);
-	          if(!doc.xml) {
-	        	  throw {};
-	          }
-	          return doc.xml;
-			} else {
-				return text;
-			}	
-		} catch(e) {
-			return 'Invalid HTML markup';
-		}
-	},
-	executeHTML = function(html) {
-		var frag = document.createDocumentFragment();
+	mainRegExp = new RegExp('('+styleTag.source+')|(<\\\/?[a-z0-9]{1,10}(?:'+attributes.source+'){0,'+maxAttributes+'}(?:\\s*\\\/?)>)|('+text.source+')|('+invalidTags.source+')','ig'),
+	frag = document.createDocumentFragment(),
+	executeHTML = function(html) {		
 		frag.innerHTML = html;		
 		html = frag.innerHTML;
 		var attributes = new RegExp('\\s+(?:sandbox-style|'+allowedAttributes.source+')\\s*='+attributeValues.source);
@@ -64,13 +51,8 @@ window.HTMLReg = function() {
 				}
 			});
 			return $tag;
-		});		
-		frag = null;
-		if(HTMLReg.validateHTML) {
-			return StringtoXML(html);
-		} else {
-			return html;
-		}
+		});				
+		return html;		
 	},	
 	parseURL = function(name, element) {
 		var value = '';	
@@ -111,8 +93,8 @@ window.HTMLReg = function() {
 		var HTMLaction = parseURL('action',element);				
 		if(element.id !== '') {				
 			var id = element.id+'';
-			id = id.replace(/[^\w]/g,'');				
-			var HTMLID = appID+'_'+id+'_';				
+			id = id.replace(new RegExp('^'+appID), '');						
+			var HTMLID = appID+id;				
 		} else {
 			var HTMLID = '';
 		}
@@ -130,7 +112,7 @@ window.HTMLReg = function() {
 			}
 			for(var i=0;i<len;i++) {
 				if(/^[\w]+$/.test(classList[i])) {
-					HTMLClass += appID+'_'+classList[i]+'_ ';
+					HTMLClass += appID+classList[i].replace(new RegExp('^'+appID),'')+' ';
 				}
 			}
 			HTMLClass = HTMLClass.replace(/\s$/,'');
@@ -139,8 +121,8 @@ window.HTMLReg = function() {
 		}			
 		if(element.getAttribute('name') !== '' && element.getAttribute('name') !== null) {
 			var name = element.getAttribute('name');
-			name = name.replace(/[^\w]/g,'');
-			element.setAttribute('name','$'+appID+'_'+name+'$');
+			name = name.replace(new RegExp('^'+appID), '');			
+			element.setAttribute('name',appID+name);			
 		}	
 		if(element.getAttribute("style") !== '' && element.getAttribute("style") !== null && element.style.cssText !== '') {	
 			var css = element.style.cssText;
@@ -183,7 +165,7 @@ window.HTMLReg = function() {
 			}
 			if (HTMLClass !== '' && typeof HTMLClass != 'undefined' && HTMLClass !== null) {
 				element.className = HTMLClass;
-			}
+			}			
 		} catch(e) {}										
 		html += '<' + tagName;
 		for(var i=0;i<element.attributes.length;i++) {
@@ -217,19 +199,67 @@ window.HTMLReg = function() {
 		html += '\n<\/style>';
 		return html;
 	},
-	parse = function(html) {	
+	parse = function(html) {
+		var consuming = null,
+			elementTracker = {},
+			scriptNode = false;
+		
 		if(HTMLReg.disablePositioning) {
-			CSSReg.disablePositioning = true;
-		} else {	
-			CSSReg.disablePositioning = false;
-		}
+            CSSReg.disablePositioning = true;
+	    } else {        
+	        CSSReg.disablePositioning = false;
+	    }
 		var output = '';
 		parseTree = '';
 		html.replace(mainRegExp, function($0, $styleTag, $tag, $text, $invalidTags) {
 			if($tag !== undefined && $tag.length) {					
 				if(!new RegExp('^<\\\/?'+allowedTags.source+'\/?[\\s>]','i').test($tag)) {
+					if(/^<\/?script[\s\/>]/i.test($tag)) {						
+						scriptNode = true;
+					}
 					return '';
-				}				
+				}												
+				var tagName = /^<\/?([a-z0-9]+)[\s\/>]/i.exec($tag);
+				if(tagName) {
+					tagName = tagName[1].toLowerCase();
+				}
+				if(!/^<\//.test($tag)) {					
+					if(consuming) {
+						output += $tag.replace(/[<>'"]/gi,function(c) {
+							var ents = {'<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'};
+							return ents[c] ? ents[c] : c;
+						});
+						return '';
+					}
+					scriptNode = false;
+					if(!elementTracker[tagName]) {
+						elementTracker[tagName] = 1;
+					} else {
+						elementTracker[tagName]++;
+					}
+				} else {			
+					if(consuming) {
+						if(tagName === consuming) {						
+							consuming = null;
+						} else {
+							output += $tag.replace(/[<>'"]/gi,function(c) {
+								var ents = {'<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'};
+								return ents[c] ? ents[c] : c;
+							});
+							return '';
+						}
+					}					
+					if(!elementTracker[tagName]) {
+						return '';
+					} else {
+						elementTracker[tagName]--;
+					}
+					scriptNode = false;
+				}	
+				
+				if(consumingTags.test($tag)){
+					consuming = tagName;					
+				}								
 				parseTree+='tag('+$tag+')\n';
 				if(!/^<\/?[a-z0-9]+>$/i.test($tag)) {						
 					$tag = parseAttrValues($tag);
@@ -239,13 +269,34 @@ window.HTMLReg = function() {
 				parseTree+='styleTag('+$styleTag+')\n';
 				$styleTag= parseStyleTag($styleTag);
 				output += $styleTag;									
-			} else if($text !== undefined && $text.length) {
+			} else if($text !== undefined && $text.length && !scriptNode) {
 				output += $text;					
 				parseTree+='text('+$text+')\n';						
-			} else if($invalidTags !== undefined && $invalidTags.length) {								
+			} else if($invalidTags !== undefined && $invalidTags.length) {	
 				parseTree+='invalidTags('+$invalidTags+')\n';									
 			} 
 		});
+		
+		if(consuming) {
+			elementTracker[consuming]--;
+			output += '</' + consuming + '>';
+			consuming = null;
+		}
+		
+		for(var i in elementTracker) {			
+			if(elementTracker.hasOwnProperty(i)) {
+				
+				if(selfClosing.test(i)) {
+					continue;
+				}
+				
+				if(elementTracker[i] > 0) {
+					for(var j=0;j<elementTracker[i];j++) {
+						output += '</' + i + '>';
+					}
+				}
+			}
+		}
 		
 		if(debug['rawOutput']) {
 			debug['rawOutput'](output);			
@@ -259,7 +310,7 @@ window.HTMLReg = function() {
 		parse: parse,
 		setAppID: function (id) {				
 			appID = id;
-		},
+		},		
 		setDebugObjs: function(obj) {
 			debug = obj;
 		}		
