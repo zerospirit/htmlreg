@@ -1,10 +1,10 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.4.3
+ * Version: 0.4.4
  */	
 
-if(Element.prototype && !Element.prototype.staticHTML) {
+if(window.Element && Element.prototype && !Element.prototype.staticHTML) {
 	window.Object.defineProperty(Element.prototype, 'staticHTML', {
 		get: function() {
 			HTMLReg.setAppID('staticHTML');
