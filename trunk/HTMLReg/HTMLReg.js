@@ -1,16 +1,18 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.4.2
+ * Version: 0.4.3
  */	
 
 if(Element.prototype && !Element.prototype.staticHTML) {
 	window.Object.defineProperty(Element.prototype, 'staticHTML', {
 		get: function() {
+			HTMLReg.setAppID('staticHTML');
 			HTMLReg.disablePositioning = true;						
 			return HTMLReg.parse(this.innerHTML+'');
 		},
 		set: function(val) {
+			HTMLReg.setAppID('staticHTML');
 			HTMLReg.disablePositioning = true;						
 			this.innerHTML = HTMLReg.parse(val+'');
 		}
