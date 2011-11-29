@@ -1,0 +1,15 @@
+<PUBLIC:COMPONENT>
+	<PUBLIC:PROPERTY ID="domObj" NAME="staticHTML" GET="getStaticHTML" PUT="setStaticHTML" />
+		<script type="text/javascript">
+			function getStaticHTML() {				
+				HTMLReg.setAppID('staticHTML');
+				HTMLReg.disablePositioning = true;						
+				return HTMLReg.parse(this.innerHTML+'');
+			};
+			function setStaticHTML(val) {
+				HTMLReg.setAppID('staticHTML');
+				HTMLReg.disablePositioning = true;						
+				this.innerHTML = HTMLReg.parse(val+'');
+			}
+		</script>
+</PUBLIC:COMPONENT>
