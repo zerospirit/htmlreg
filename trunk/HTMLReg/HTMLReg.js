@@ -1,7 +1,7 @@
 /*
  * HTMLReg
  * By Gareth Heyes
- * Version: 0.4.4
+ * Version: 0.4.5
  */	
 
 if(window.Element && Element.prototype && !Element.prototype.staticHTML) {
@@ -92,7 +92,12 @@ window.HTMLReg = function() {
 		var HTMLhref = parseURL('href',element);
 		var HTMLsrc = parseURL('src',element);		
 		var HTMLbackground = parseURL('background',element);			
-		var HTMLaction = parseURL('action',element);				
+		var HTMLaction = parseURL('action',element);
+		
+		if(element.getAttribute('target') !== null || element.getAttribute('target') !== '') {
+			element.setAttribute('target','_blank');
+		}
+		
 		if(element.id !== '') {				
 			var id = element.id+'';
 			id = id.replace(new RegExp('^'+appID), '');						
@@ -100,6 +105,7 @@ window.HTMLReg = function() {
 		} else {
 			var HTMLID = '';
 		}
+		
 		if(element.className !== '') {
 			var classList = element.className+'';
 			classList = classList.replace(/[^ \w]/g,'');
@@ -146,6 +152,7 @@ window.HTMLReg = function() {
 			if(/^a$/i.test(tagName)) {
 				element.setAttribute('rel','nofollow');
 			}
+			
 			if (HTMLhref !== '' && typeof HTMLhref != 'undefined' && HTMLhref !== null) {				
 				if(/^#/.test(HTMLhref)) {
 					element.setAttribute('href', HTMLhref);
