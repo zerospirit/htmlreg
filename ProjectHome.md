@@ -1,0 +1,1 @@
+Converts malicious HTML/CSS into a safe form of HTML
